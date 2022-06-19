@@ -7,13 +7,24 @@ class Coffee:
         self.milk = milk
         self.cost = cost
 
-    def getResource(self, string):
+    def getResource(self, resource):
 
-        if string == "water":
-            return self.water
-        elif string == "coffee":
-            return self.coffee
-        elif string == "milk":
-            return self.milk
-        elif string == "cost":
-            return self.cost
+        match resource:
+            case "water":
+                return self.getWater()
+            case "coffee":
+                return self.getCoffee()
+            case "milk":
+                return self.getMilk()
+
+    def getWater(self):
+        return self.water
+
+    def getCoffee(self):
+        return self.coffee
+
+    def getMilk(self):
+        return self.milk
+
+    def getCost(self):
+        return self.cost

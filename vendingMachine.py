@@ -5,33 +5,32 @@ class VendingMachine:
         "coffee": 100,
     }
     profit = 0
-    coffee_list = []
+    coffee_dict = {}
 
     def turnOn(self, is_on=True):
 
         while is_on:
-            selection = input("What would you like? (espresso/latte/cappuccino): ")
 
-            if selection == "off":
-                print("Machine shutting down...")
-                is_on = False
-            elif selection == "report":
-                print(
-                    f"Water: {self.resources.get('water')}ml\n"
-                    f"Milk: {self.resources.get('milk')}ml\n"
-                    f"Coffee: {self.resources.get('coffee')}g\n"
-                    f"Money: ${self.profit}"
-                )
-            else:
-                for c in self.coffee_list:
-                    if c.name.lower() == selection.lower():
-                        if self.checkResources(c):
-                            if self.getCoins(c):
-                                self.makeCoffee(c)
+            selection = input("What would you like? (espresso/latte/cappuccino): ").lower()
+
+            match selection:
+                case "off":
+                    print("Machine shutting down...")
+                    is_on = False
+                case "report":
+                    self.printReport()
+                case _:
+                    if selection in self.coffee_dict:
+                        if self.checkResources(self.coffee_dict[selection]):
+                            if self.getCoins(self.coffee_dict[selection]):
+                                self.makeCoffee(self.coffee_dict[selection])
+                    else:
+                        print("Please select a coffee from the list.")
 
     def makeCoffee(self, coffee):
-        for item in self.resources:
-            self.resources[item] -= coffee.getResource(item)
+        self.resources["water"] -= coffee.getWater()
+        self.resources["milk"] -= coffee.getMilk()
+        self.resources["coffee"] -= coffee.getCoffee()
 
         print(f"Enjoy your {coffee.name}!")
 
@@ -52,13 +51,21 @@ class VendingMachine:
         total += float(input("How many nickles?: ")) * 0.05
         total += float(input("How many pennies?: ")) * 0.01
 
-        if total < coffee.getResource("cost"):
+        if total < coffee.getCost():
             print("Sorry that's not enough money. Money refunded.")
             return False
         else:
-            change = total - coffee.getResource('cost')
-            if total > coffee.getResource("cost"):
+            change = total - coffee.getCost()
+            if total > coffee.getCost():
                 print(f"Here is ${round(change, 2)} in change.")
 
             self.profit += total - change
             return True
+
+    def printReport(self):
+        print(
+            f"Water: {self.resources.get('water')}ml\n"
+            f"Milk: {self.resources.get('milk')}ml\n"
+            f"Coffee: {self.resources.get('coffee')}g\n"
+            f"Money: ${self.profit}"
+        )
